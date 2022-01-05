@@ -37,35 +37,33 @@ app.get('/messages', (req, res) => {
     
 })
 
-app.post('/messages', (req, res) => {
+app.post('/messages', async (req, res) => {
 
     // Create an object for mongoose.
     var message = new Message(req.body);
 
-    message.save()
-    .then( () => {
-        console.log('Saved.');
+    var savedMessage = await message.save()
+    
+    console.log('Saved.');
 
-        // Returns a promise.
-        return Message.findOne({message: 'badword'});
-    })
-    .then( censored => {
-        if (censored) {
-            console.log('Censored words found.', censored);
-            
-            // Any errors will be caught by the catch at the end.
-            // This also returns a Promise.
-            return Message.remove({_id: censored.id} );
-        }
-
+    // Returns a promise.
+    var censored =  await Message.findOne({message: 'badword'});
+    
+    if (censored) {
+        await Message.remove({_id: censored.id} );
+    }
+    else {
         // Socket.io
         io.emit('message', req.body);
-        res.sendStatus(200);
-    })
+    }
+
+    res.sendStatus(200);
+
+    /*
     .catch( (err) => {
         res.sendStatus(500);
         console.error(err);
-    })
+    })*/
  
 })
 
