@@ -69,6 +69,9 @@ app.post('/messages', async (req, res) => {
         res.sendStatus(500);
         console.error(error);
     }
+    finally {
+        console.log('Logging message on success or failure.');
+    }
  
 })
 
