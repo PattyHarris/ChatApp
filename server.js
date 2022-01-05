@@ -39,31 +39,36 @@ app.get('/messages', (req, res) => {
 
 app.post('/messages', async (req, res) => {
 
-    // Create an object for mongoose.
-    var message = new Message(req.body);
+    try {
 
-    var savedMessage = await message.save()
-    
-    console.log('Saved.');
+        // Test the try/catch
+        // throw 'Testing the catch code.';
 
-    // Returns a promise.
-    var censored =  await Message.findOne({message: 'badword'});
-    
-    if (censored) {
-        await Message.remove({_id: censored.id} );
+        // Create an object for mongoose.
+        var message = new Message(req.body);
+
+        var savedMessage = await message.save()
+        
+        console.log('Saved.');
+
+        // Returns a promise.
+        var censored =  await Message.findOne({message: 'badword'});
+        
+        if (censored) {
+            await Message.remove({_id: censored.id} );
+        }
+        else {
+            // Socket.io
+            io.emit('message', req.body);
+        }
+
+        res.sendStatus(200);
+
     }
-    else {
-        // Socket.io
-        io.emit('message', req.body);
-    }
-
-    res.sendStatus(200);
-
-    /*
-    .catch( (err) => {
+    catch (error) {
         res.sendStatus(500);
-        console.error(err);
-    })*/
+        console.error(error);
+    }
  
 })
 
