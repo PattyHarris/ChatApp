@@ -37,6 +37,17 @@ app.get('/messages', (req, res) => {
     
 })
 
+// Get all the messages for a given user.
+app.get('/messages/:user', (req, res) => {
+
+    var user = req.params.user;
+
+    Message.find( {name: user}, (err, messages) => {
+        res.send(messages);
+    })
+    
+})
+
 app.post('/messages', async (req, res) => {
 
     try {
